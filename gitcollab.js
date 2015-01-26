@@ -8,7 +8,8 @@ module.exports = {
 	filterCommitsByRepoUrl: filterCommitsByRepoUrl,
 	getContributionStats: getContributionStats,
 	getCoauthorshipStats: getCoauthorshipStats,
-	showContributionsByFile: showContributionsByFile
+	showContributionsByFile: showContributionsByFile,
+	normalizeCommitsForAuthorEmailAliases: normalizeCommitsForAuthorEmailAliases
 };
 
 function loadCommits(repoLogJsonUrls, onLoadCallback) {
@@ -27,6 +28,16 @@ function loadCommits(repoLogJsonUrls, onLoadCallback) {
     console.log('commits', commits);
 		onLoadCallback(commits);
   });
+}
+
+function normalizeCommitsForAuthorEmailAliases(authorEmailAliases, commits) {
+	_.forEach(commits, function(commit) {
+		var authorEmail = commit.authorEmail;
+		if (authorEmail in authorEmailAliases) {
+			commit.authorEmail = authorEmailAliases[authorEmail];
+		}
+	});
+	return commits;
 }
 
 function filterCommitsByCommitId(commits, commitId) {
