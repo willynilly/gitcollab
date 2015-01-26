@@ -32,9 +32,11 @@ function loadCommits(repoLogJsonUrls, onLoadCallback) {
 
 function normalizeCommitsForAuthorEmailAliases(authorEmailAliases, commits) {
 	_.forEach(commits, function(commit) {
-		var authorEmail = commit.authorEmail;
+		var authorEmail = commit.author.email;
+		console.log(authorEmail);
 		if (authorEmail in authorEmailAliases) {
-			commit.authorEmail = authorEmailAliases[authorEmail];
+			commit.author.email = authorEmailAliases[authorEmail];
+			console.log(commit);
 		}
 	});
 	return commits;
