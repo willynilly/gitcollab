@@ -1,0 +1,207 @@
+<html>
+<head>
+  <title>GitCollab</title>
+  <script type="text/javascript"
+    src="https://www.google.com/jsapi?autoload={'modules':[{'name':'visualization','version':'1.1','packages':['sankey', 'corechart']}]}">
+  </script>
+</head>
+<body>
+  <h1>GitCollab</h1>
+  <p>By: Will Riley</p>
+
+  <style>
+  .statChart {
+    margin-bottom: 20px;
+  }
+  </style>
+
+
+  <div id="repoInfo">
+    Git Repos: <span id="repoNames"></span>
+  </div>
+  
+  <div class="statChart">
+  <h3>Total Files Coauthored</h3>
+  <div id="totalFilesBoxPlotChart" style=""></div>
+  </div>
+  
+  <div class="statChart">
+  <h3>Total Files Coauthored</h3>
+  <div id="totalFilesSanKeyChart" style=""></div>
+  </div>
+
+  <div class="statChart">
+  <h3>Total Lines Added By the First Coauthor to Files edited by the Second Coauthor</h3>  
+  <div id="totalAddedLinesSanKeyChart" style=""></div>
+  </div>
+  
+  <div class="statChart">
+  <h3>Total Lines Removed By the First Coauthor from Files edited by the Second Coauthor</h3>
+  <div id="totalRemovedLinesSanKeyChart" style=""></div>
+  </div>
+  
+  <script src="bundle.js"></script>
+  <script type="text/javascript">
+  var $ = require('jquery-browserify');
+  var _ = require('lodash');
+  var math = require('mathjs');
+  
+  var gitcollab = require('gitcollab');
+  
+  google.setOnLoadCallback(drawCharts);
+
+  function drawCharts() {
+    
+    //var jsonRepoLogUrl = 'react-log.json';
+    
+    var repoNames = ['angular', 'til'];
+    var jsonRepoLogUrls = [];
+    
+    _.forEach(repoNames, function(repoName) {
+      var url = 'logs/' + repoName + '-log.json';
+      jsonRepoLogUrls.push(url);
+    });
+    
+    $('#repoNames').html('<ul><li>' + repoNames.join('</li><li>') + '</li></ul>');
+    
+  	gitcollab.loadCommits(jsonRepoLogUrls, function(commits) {
+
+      var contributionStats = gitcollab.getContributionStats(commits);     	      
+      var coauthorshipStats = gitcollab.getCoauthorshipStats(contributionStats);    
+    
+      var totalFilesRowsForBoxPlotChart = getCoauthorshipStatsRowsForBoxPlotChart(coauthorshipStats, 'totalFiles');
+      drawBoxPlotChart('totalFilesBoxPlotChart', 'Coauthored File Count Per Person', totalFilesRowsForBoxPlotChart);
+    
+    
+      var totalAddedLinesRowsForSanKeyChart = getCoauthorshipStatsRowsForSanKeyChart(coauthorshipStats, 'totalAddedLines');
+      var totalRemovedLinesRowsForSanKeyChart = getCoauthorshipStatsRowsForSanKeyChart(coauthorshipStats, 'totalRemovedLines');
+      var totalFilesRowsForSanKeyChart = getCoauthorshipStatsRowsForSanKeyChart(coauthorshipStats, 'totalFiles');
+
+      drawSanKeyChart('totalAddedLinesSanKeyChart', 'black', 'green', totalAddedLinesRowsForSanKeyChart);
+      drawSanKeyChart('totalRemovedLinesSanKeyChart', 'gray', 'red', totalRemovedLinesRowsForSanKeyChart);
+      drawSanKeyChart('totalFilesSanKeyChart', 'gray', 'blue', totalRemovedLinesRowsForSanKeyChart);
+      
+    });
+  }
+
+  function drawBoxPlotChart(chartElementId, verticalTitle, rows) {
+      // Create and populate the data table. Column 6: median, Column 7: mean. Values are invented!
+      var data = google.visualization.arrayToDataTable(rows, true);
+  
+      // Create and draw the visualization.
+      var chart = new google.visualization.ComboChart(document.getElementById(chartElementId));
+      var options = {
+        legend: 'none',
+        title : 'Box Plot with Median (red) and Average (black), sorted by Median descending',
+        width: 80 * rows.length,
+        height: 500,
+        vAxis: {title: verticalTitle},
+        hAxis: {title: "Author"},
+        series: { 0: {type: "candlesticks"}, 1: {type: "line", pointSize: 3, lineWidth: 0 }, 2: {type: "line", pointSize: 3, lineWidth: 0, color: 'black' } }
+      };
+      chart.draw(data, options);
+  }
+
+  function drawSanKeyChart(chartElementId, nodeColor, linkColor, rows) {    
+      var data = new google.visualization.DataTable();
+      data.addColumn('string', 'From');
+      data.addColumn('string', 'To');
+      data.addColumn('number', 'Weight');
+      
+      /* this is a visualization hack so that the first relationship can be seen */
+      rows.unshift([' ', '  ', 4]);
+        
+      data.addRows(rows);
+    
+      var nodeWidth = 5;
+      var nodePadding = 10;
+      
+      // Set chart options
+      var options = {
+        sankey: {
+             link: { color: { fill: linkColor } },
+          
+             node: {
+               color: {fill: nodeColor, opacity: 1 },               
+               label: {
+                 fontName: 'Times-Roman',
+                 fontSize: 12,
+                 color: '#000',
+                 bold: true,
+                 italic: false
+               },
+               labelPadding: 6, // Horizontal distance between the label and the node.
+               nodePadding: nodePadding, // Vertical distance between nodes.
+               width: nodeWidth         // Thickness of the node.
+             }
+           },
+           height: Math.round(Math.round(Math.pow(rows.length, .5)) * (nodeWidth + (2.5 * nodePadding)))
+      };
+
+      // Instantiate and draw our chart, passing in some options.
+      var chart = new google.visualization.Sankey(document.getElementById(chartElementId));
+      chart.draw(data, options);
+     }
+          
+     function getCoauthorshipStatsRowsForSanKeyChart(coauthorshipStats, property) {
+        var rows = [];
+        _.forEach(coauthorshipStats, function(toAuthorStats, fromAuthorEmail) {
+          _.forEach(toAuthorStats, function(stats, toAuthorEmail) {
+            if (property in stats) {
+              var val = stats[property];
+              if (!isNaN(val) && val > 0) {
+                var row = {fromAuthorEmail: fromAuthorEmail, toAuthorEmail: toAuthorEmail + ' ', value: val};
+                rows.push(row);
+              }
+            }
+          });
+        });
+        // sort rows
+        rows = _.sortBy(rows, ['fromAuthorEmail', 'toAuthorEmail']).map(function(row) {
+          return [row.fromAuthorEmail, row.toAuthorEmail, row.value];
+        });
+        return rows;
+     }
+     
+     function getCoauthorshipStatsRowsForBoxPlotChart(coauthorshipStats, property) {
+        var rows = [];
+        var authorEmails = _.keys(coauthorshipStats);
+        _.forEach(coauthorshipStats, function(toAuthorStats, fromAuthorEmail) {
+          var propertyVals = [];
+          _.forEach(toAuthorStats, function(stats, toAuthorEmail) {
+            if (property in stats) {
+              var val = stats[property];
+              if (!isNaN(val) && val > 0) {
+                propertyVals.push(val);                
+              }
+            }
+          });
+          //while(propertyVals.length < authorEmails.length - 1) {
+          //  propertyVals.push(0);
+          //}
+          var row = [fromAuthorEmail].concat(getBoxPlotStatsArray(propertyVals));
+          rows.push(row); 
+        });
+        
+        // sort rows by median desc
+        rows.sort(function(a,b) {
+          return b[5] - a[5];
+        });
+        
+        console.log('boxplot', rows);
+        
+        return rows;
+     }
+     
+     function getBoxPlotStatsArray(data) {
+       var mean = math.mean(data);
+       data.sort();
+       var q1 = data[math.max(math.floor(data.length*.25) - 1, 0)];
+       var q3 = data[math.max(math.floor(data.length*.75) - 1, 0)];
+       return [math.min(data), q1, q3, math.max(data), math.median(data), math.mean(data)];
+     }
+     
+  </script>
+  
+</body>
+</html>

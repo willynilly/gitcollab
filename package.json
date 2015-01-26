@@ -1,0 +1,34 @@
+{
+  "name": "gitcollab",
+  "version": "1.0.0",
+  "description": "Generates and visualizes collaboration statistics for git repos.",
+  "main": "gitcollab.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/willynilly/gitcollab.git"
+  },
+  "keywords": [
+    "git",
+    "statistics",
+    "collaboration"
+  ],
+  "author": "Will Riley <will@quietsimple.com> (http://willriley.net/)",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/willynilly/gitcollab/issues"
+  },
+  "homepage": "https://github.com/willynilly/gitcollab",
+  "dependencies": {
+    "jquery-browserify": "^1.8.1",
+    "mathjs": "^1.2.0",
+    "lodash": "^2.4.1"
+  },
+  "devDependencies": {
+    "browserify": "^8.1.1",
+    "watchify": "^2.2.1",
+    "local-web-server": "^0.5.16"
+  }
+}
