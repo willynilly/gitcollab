@@ -55,18 +55,14 @@
 
   function drawCharts() {
         
-    var repoNames = ['angular.js'];//['ng-table'];
+    var repoNames = ['riotjs'];
     var authorEmailAliases = {
       // 'someAliasEmailAddress@somewhere.com': 'someEmailAddress@somewhere.com'
       // 'someOtherAliasEmailAddress@somewhere.com' : 'someEmailAdddress@somwhere.com'
     };
 
     // create json repo log urls from repo names
-    var jsonRepoLogUrls = [];
-    _.forEach(repoNames, function(repoName) {
-      var url = 'logs/' + repoName + '-log.json';
-      jsonRepoLogUrls.push(url);
-    });
+    var jsonRepoLogUrls = gitcollab.getJsonRepoLogUrlsFromRepoNames(repoNames);
     
     $('#repoNames').html('<ul><li>' + repoNames.join('</li><li>') + '</li></ul>');
     

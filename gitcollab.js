@@ -9,7 +9,8 @@ module.exports = {
 	getContributionStats: getContributionStats,
 	getCoauthorshipStats: getCoauthorshipStats,
 	showContributionsByFile: showContributionsByFile,
-	normalizeCommitsForAuthorEmailAliases: normalizeCommitsForAuthorEmailAliases
+	normalizeCommitsForAuthorEmailAliases: normalizeCommitsForAuthorEmailAliases,
+	getJsonRepoLogUrlsFromRepoNames:getJsonRepoLogUrlsFromRepoNames
 };
 
 function loadCommits(repoLogJsonUrls, onLoadCallback) {
@@ -133,6 +134,14 @@ function getCoauthorshipStats(contributionStats) {
 	}, {});
 }
 
+function getJsonRepoLogUrlsFromRepoNames(repoNames) {
+    var jsonRepoLogUrls = [];
+    _.forEach(repoNames, function(repoName) {
+      var url = 'logs/' + repoName + '-log.json';
+      jsonRepoLogUrls.push(url);
+    });
+    return jsonRepoLogUrls;
+  }
 
 /* display functions */
 function showContributionsByFile(contributionsByFile) {

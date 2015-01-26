@@ -7,9 +7,9 @@ you will need python's pip utility already installed
 from terminal run: 
 ./install.sh
 
-then, to download and convert a git repo (like the AngularJS repo) to a json log, run:
+then, to download and convert a git repo (like the Riot repo) to a json log, run:
 
-clonegit2json.sh https://github.com/angular/angular.js.git
+clonegit2json.sh https://github.com/muut/riotjs.git
 
 then edit your index.html so that it has the correct repo names in the variable called repoNames.  Finally, add any known email aliases for the repos (like if the same person has two email addresses).
 
