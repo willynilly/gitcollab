@@ -74,7 +74,7 @@
 
       console.log(commits);
 
-      var commits = normalizeCommitsForAuthorEmailAliases(authorEmailAliases, commits);
+      var commits = gitcollab.normalizeCommitsForAuthorEmailAliases(authorEmailAliases, commits);
 
       var contributionStats = gitcollab.getContributionStats(commits);     	      
       var coauthorshipStats = gitcollab.getCoauthorshipStats(contributionStats);    
