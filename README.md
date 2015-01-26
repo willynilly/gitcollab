@@ -21,7 +21,7 @@ next, to start the local webserver, run:
 
 ws
 
-finally, open your browser to whatever the server starts running, like:
+finally, open your browser to wherever the server starts running, like:
 
 http://localhost:8000
 
