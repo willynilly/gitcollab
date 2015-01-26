@@ -2,7 +2,7 @@
 Generates and visualizes collaboration statistics for git repos.
 By: Will Riley
 
-you will pip already installed
+you will need python's pip utility already installed
 
 from terminal run: 
 ./install.sh
