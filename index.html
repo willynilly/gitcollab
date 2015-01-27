@@ -25,11 +25,15 @@
   
   <div class="statChart">
   <h3>Total Files Coauthored</h3>
+  <p>The box plot shows the spread of the number of files coauthored between the author and other authors.  For example, the author may have coauthored 3 files with person A, 6 files with author B, and 1 file with author C.  If an author did not coauthor a file with another another author, it does not show up in the spread.  Thus, each boxplot may represent a different number of coauthors.</p>
+  <p>A higher median score means more coauthored files.  Note: it only measures coauthored files; an author with a low score may still author many files without any coauthors.</p> 
   <div id="totalFilesBoxPlotChart" style=""></div>
   </div>
 
   <div class="statChart">
   <h3>Total Time Between Editing Coauthored Files</h3>
+  <p>The box plot shows the spread of the total amount of time between coauthoring with another person.  Specifically, for each commit by the author, it finds the closest commit in that same file by the coauthor, and sums up the temporal distances.  Hence, if two authors tend to have interleaved commits they will have a lower total temporal distance between closest commits; conversely, if two coauthors tend to have temporally segregated commits, they will have a higher total temporal distance between closest commits. Note: Each boxplot only contains data points for coauthors; hence each boxplot may represent a different number of coauthors.</p> 
+  <p>A high median score indicates longer periods of time without coauthoring with a specific person.  Note: a person may have a high median score and still be continously coauthoring, but it would likely have to be for small amounts of time and with many different people.  A low median score indicates longer periods of time coauthoring with a specific person.</p>
   <div id="totalTimeGapsBoxPlotChart" style=""></div>
   </div>
   
