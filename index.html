@@ -27,6 +27,11 @@
   <h3>Total Files Coauthored</h3>
   <div id="totalFilesBoxPlotChart" style=""></div>
   </div>
+
+  <div class="statChart">
+  <h3>Total Time Between Editing Coauthored Files</h3>
+  <div id="totalTimeGapsBoxPlotChart" style=""></div>
+  </div>
   
   <div class="statChart">
   <h3>Total Files Coauthored</h3>
@@ -67,17 +72,23 @@
     $('#repoNames').html('<ul><li>' + repoNames.join('</li><li>') + '</li></ul>');
     
   	gitcollab.loadCommits(jsonRepoLogUrls, function(commits) {
-
-      console.log(commits);
-
       var commits = gitcollab.normalizeCommitsForAuthorEmailAliases(authorEmailAliases, commits);
-
       var contributionStats = gitcollab.getContributionStats(commits);     	      
       var coauthorshipStats = gitcollab.getCoauthorshipStats(contributionStats);    
-    
+
       var totalFilesRowsForBoxPlotChart = getCoauthorshipStatsRowsForBoxPlotChart(coauthorshipStats, 'totalFiles');
       drawBoxPlotChart('totalFilesBoxPlotChart', 'Coauthored File Count Per Person', totalFilesRowsForBoxPlotChart);
     
+      var totalTimeGapsRowsForBoxPlotChart = getCoauthorshipStatsRowsForBoxPlotChart(coauthorshipStats, 'totalTimeBetweenClosestChanges');
+      // convert milliseconds to hours
+      var millisecondsPerHour = (60*60*1000);
+      _.forEach(totalTimeGapsRowsForBoxPlotChart, function(row) {
+        _.forEach([1,2,3,4,5,6], function(i) {
+          row[i] /= millisecondsPerHour;
+        });
+      });
+      drawBoxPlotChart('totalTimeGapsBoxPlotChart', 'Total Time Between Coauthoring Per Person (hours)', totalTimeGapsRowsForBoxPlotChart);
+
     
       var totalAddedLinesRowsForSanKeyChart = getCoauthorshipStatsRowsForSanKeyChart(coauthorshipStats, 'totalAddedLines');
       var totalRemovedLinesRowsForSanKeyChart = getCoauthorshipStatsRowsForSanKeyChart(coauthorshipStats, 'totalRemovedLines');
@@ -182,20 +193,13 @@
               }
             }
           });
-          //while(propertyVals.length < authorEmails.length - 1) {
-          //  propertyVals.push(0);
-          //}
           var row = [fromAuthorEmail].concat(getBoxPlotStatsArray(propertyVals));
           rows.push(row); 
         });
-        
         // sort rows by median desc
         rows.sort(function(a,b) {
           return b[5] - a[5];
-        });
-        
-        console.log('boxplot', rows);
-        
+        });        
         return rows;
      }
      
