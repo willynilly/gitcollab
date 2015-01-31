@@ -24,7 +24,6 @@ function loadCommits(repoLogJsonUrls, onLoadCallback) {
 			commits = commits.concat(newCommits);
     }));
 	});
-	
   $.when.apply($, requests).done(function() {
 		onLoadCallback(commits);
   });
@@ -138,7 +137,6 @@ function getCoauthorshipStats(contributionStats) {
 						stats.totalFiles += 1;
 						stats.totalAddedLines += contribution.totalAddedLines;
 						stats.totalRemovedLines += contribution.totalRemovedLines;
-
 						var newTimeGapHistory = getTimeGapHistoryForClosestChanges(fromAuthorEmail, toAuthorEmail, changeHistoryForFile);
 						stats.totalTimeBetweenClosestChanges += getTotalTimeBetweenClosestChanges(newTimeGapHistory);
 						_.forEach(newTimeGapHistory, function(timeGap) {
@@ -167,7 +165,7 @@ function _getNextChangeByOtherAuthorEmail(otherAuthorEmail, changeHistoryForFile
 }
 
 function _getPrevChangeByOtherAuthorEmail(otherAuthorEmail, changeHistoryForFile, changeIndex) {
-	// find the next change by other author email if it exist
+	// find the previous change by other author email if it exist
 	var prevChangeByOtherAuthorEmail = null;
 	var curChange = null;
  	for (var j = changeIndex; j >= 0; j--) {
@@ -246,14 +244,21 @@ function getTotalTimeBetweenClosestChanges(timeGapHistoryForClosestChanges) {
 	}, 0);
 }
 
-function getJsonRepoLogUrlsFromRepoNames(repoNames) {
-    var jsonRepoLogUrls = [];
-    _.forEach(repoNames, function(repoName) {
-      var url = 'logs/' + repoName + '-log.json';
-      jsonRepoLogUrls.push(url);
-    });
-    return jsonRepoLogUrls;
-  }
+function getJsonRepoLogUrlsFromRepoNames(repoNames, logDir, logFileSuffix) {
+	if (logDir === undefined) {
+		lodDir = 'logs/';
+	}
+	if (logFileSuffix === undefined) {
+		logFileSuffix = '-log.json';
+	}	
+	var jsonRepoLogUrls = [];
+  _.forEach(repoNames, function(repoName) {
+    var url = logDir + repoName + logFileSuffix;
+    jsonRepoLogUrls.push(url);
+  });
+  return jsonRepoLogUrls;
+}
+
 
 /* display functions */
 function showContributionsByFile(contributionsByFile) {
