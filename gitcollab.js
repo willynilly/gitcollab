@@ -246,7 +246,7 @@ function getTotalTimeBetweenClosestChanges(timeGapHistoryForClosestChanges) {
 
 function getJsonRepoLogUrlsFromRepoNames(repoNames, logDir, logFileSuffix) {
 	if (logDir === undefined) {
-		lodDir = 'logs/';
+		logDir = 'logs/';
 	}
 	if (logFileSuffix === undefined) {
 		logFileSuffix = '-log.json';
